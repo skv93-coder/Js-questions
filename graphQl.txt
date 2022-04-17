@@ -1,0 +1,16 @@
+Qs =>What is graphql ?
+ans=> Graphql is query language and server side runtime that priortize giving the clients data they request and no more.
+
+So in graphql API dev to create schema to describe all the possible data that client can query through the services
+
+What is graphql schema ?
+
+Graphql schema made up of type of objects , which have the fields that can be requested by the client.
+
+So when client send queries graaphql validates the query and then excutes the query.
+
+Now each fields in the query corresponds to a resolver functions.
+
+What are diff graphql operations?
+ans => 1. Query
+       2. Muations
