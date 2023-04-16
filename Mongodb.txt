@@ -1,0 +1,109 @@
+what is mongodb
+
+MongoDB is a popular open-source document-oriented NoSQL database that stores data in flexible, JSON-like documents.
+It was developed by MongoDB Inc. and first released in 2009. MongoDB uses a document data model, 
+which means it can store data in a way that closely mirrors the structure of the data in an application, 
+making it easy to work with for developers.
+
+Some key features of MongoDB include:
+
+Schemaless data model: MongoDB does not require a predefined schema, allowing for flexibility and agility in data modeling.
+Automatic sharding: MongoDB can automatically split data across multiple servers, making it easy to scale horizontally.
+Querying: MongoDB supports a rich query language and supports aggregation pipelines for complex data processing.
+Indexing: MongoDB allows for flexible indexing options, including compound indexes and geospatial indexes.
+Replication: MongoDB can replicate data across multiple servers for improved availability and durability.
+MongoDB is used by many companies and organizations, including Adobe, eBay, and The New York Times. 
+It is particularly well-suited for applications that require flexible data modeling and horizontal scalability.
+
+
+
+
+Question
+suppose i have multiple db query one after other and if one of the query fails 
+i want reverse all the changes made by any query how can i do that
+To ensure that all the changes made by a series of database queries are rolled back 
+if any one of them fails, you can use database transactions. 
+A transaction is a sequence of one or more database operations that are 
+treated as a single unit of work, and either all the operations succeed or none of them are applied.
+
+In MongoDB, you can use transactions to perform multiple operations on multiple collections or 
+databases and either commit them all or roll them all back if any operation fails. 
+Here's an example of how to use transactions in MongoDB:
+
+scss
+Copy code
+// Start a client session
+session = client.startSession()
+
+// Define a transaction function
+transaction = function() {
+    // Start a transaction
+    session.startTransaction()
+
+    try {
+        // Execute your queries here, for example:
+        db.collection('customers').updateOne({ _id: 123 }, { $set: { name: 'John' } })
+        db.collection('orders').insertOne({ customer_id: 123, total: 100 })
+
+        // If all queries succeed, commit the transaction
+        session.commitTransaction()
+    } catch (error) {
+        // If any query fails, abort the transaction
+        session.abortTransaction()
+        throw error
+    }
+}
+
+// Execute the transaction
+session.withTransaction(transaction)
+In this example, the withTransaction method is used to execute the transaction function. 
+If any of the queries in the transaction fail, the abortTransaction method is called, 
+and all changes made by the queries are rolled back. 
+If all queries succeed, the commitTransaction method is called, and the changes are saved.
+
+By using transactions in this way, you can ensure that your database operations are atomic and consistent, 
+and that all changes are rolled back if any query fails.
+
+
+
+
+Question=>
+write the abopve code with mongoose
+Sure! Here's an example of how to use transactions in Mongoose, which is a popular Node.js ORM for MongoDB:
+
+scss
+Copy code
+// Start a client session
+session = await mongoose.startSession()
+
+// Define a transaction function
+transaction = async function() {
+    // Start a transaction
+    await session.startTransaction()
+
+    try {
+        // Execute your queries here, for example:
+        await Customer.updateOne({ _id: 123 }, { name: 'John' }).session(session)
+        await Order.create([{ customer_id: 123, total: 100 }], { session: session })
+
+        // If all queries succeed, commit the transaction
+        await session.commitTransaction()
+    } catch (error) {
+        // If any query fails, abort the transaction
+        await session.abortTransaction()
+        throw error
+    }
+}
+
+// Execute the transaction
+await transaction()
+In this example, we're using Mongoose to define our database schema and perform our queries. The startSession
+method creates a new client session, which we use to execute our queries. We pass the session object to our 
+Mongoose queries using the session option.
+
+The transaction function is defined using the async keyword, and we're using await to wait for each query to complete
+before executing the next one. If any query fails, we catch the error and call session.abortTransaction() to roll back
+all changes made by the queries. If all queries succeed, we call session.commitTransaction() to save the changes.
+
+Finally, we call the transaction function using await to wait for it to complete. This ensures that our database 
+operations are atomic and consistent, and that all changes are rolled back if any query fails.
